@@ -39,12 +39,12 @@ import math
 
 import tensorflow as tf
 
-from domain_adaptation.datasets import dataset_factory
-from domain_adaptation.pixel_domain_adaptation import pixelda_model
-from domain_adaptation.pixel_domain_adaptation import pixelda_preprocess
-from domain_adaptation.pixel_domain_adaptation import pixelda_utils
-from domain_adaptation.pixel_domain_adaptation import pixelda_losses
-from domain_adaptation.pixel_domain_adaptation.hparams import create_hparams
+from datasets import dataset_factory
+import pixelda_model
+import pixelda_preprocess
+import pixelda_utils
+import pixelda_losses
+from hparams import create_hparams
 
 slim = tf.contrib.slim
 
@@ -289,8 +289,8 @@ def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
   hparams = create_hparams(FLAGS.hparams)
   run_eval(
-      run_dir=FLAGS.eval_dir,
-      checkpoint_dir=FLAGS.checkpoint_dir,
+      run_dir="/home/wanlu/tf_models/models/research/domain_adaptation/pixel_domain_adaptation/office",
+      checkpoint_dir="/home/wanlu/tf_models/models/research/domain_adaptation/pixel_domain_adaptation/office",
       hparams=hparams)
 
 

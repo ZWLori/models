@@ -2,7 +2,7 @@
 
 package(
     default_visibility = [
-        ":internal",
+        "//visibility:public",
     ],
 )
 

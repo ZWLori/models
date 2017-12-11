@@ -72,7 +72,7 @@ py_binary(
         ":pixelda_preprocess",
         ":pixelda_utils",
         
-        "//domain_adaptation/datasets:dataset_factory",
+        "@datasets//:dataset_factory",
     ],
 )
 
@@ -85,6 +85,6 @@ py_binary(
         ":pixelda_preprocess",
         ":pixelda_utils",
         
-        "//domain_adaptation/datasets:dataset_factory",
+        "@datasets//:dataset_factory",
     ],
 )

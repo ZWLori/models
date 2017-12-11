@@ -38,7 +38,7 @@ import tensorflow as tf
 
 slim = tf.contrib.slim
 
-from domain_adaptation.pixel_domain_adaptation import pixelda_task_towers
+import pixelda_task_towers
 
 
 def create_model(hparams,

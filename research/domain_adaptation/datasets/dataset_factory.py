@@ -20,10 +20,10 @@ from __future__ import print_function
 
 # Dependency imports
 import tensorflow as tf
-
+import os
 from slim.datasets import mnist
-from domain_adaptation.datasets import mnist_m
-
+import mnist_m
+from slim.datasets import dataset_utils
 slim = tf.contrib.slim
 
 
@@ -48,10 +48,65 @@ def get_dataset(dataset_name,
   Raises:
     ValueError: if `dataset_name` isn't recognized.
   """
+
+# test model for office dataset
+  if dataset_name in ['amazon', 'webcam', 'dslr']:    
+    if dataset_utils.has_labels(dataset_dir, dataset_name+'_labels.txt'):
+      labels_to_names = dataset_utils.read_label_file(dataset_dir, dataset_name+'_labels.txt')
+    
+    _FILE_PATTERN = dataset_name+'_'+split_name+'.tfrecord'
+    _NUM_CLASSES = 31
+
+    if dataset_name == 'amazon':
+      _SPLITS_TO_SIZES = {
+        'train': 1972,
+        'validation': 845
+      }
+    elif dataset_name == 'webcam':
+      _SPLITS_TO_SIZES = {
+          'train': 557,
+          'validation': 238
+        }
+    
+    _ITEMS_TO_DESCRIPTIONS = {
+      'image': 'A colored image of varying height and width.',
+      'label': 'The label id of the image, integer between 0 and 30.',
+    }
+
+    keys_to_features = {
+      'image/encoded':
+          tf.FixedLenFeature((), tf.string, default_value=''),
+      'image/format':
+          tf.FixedLenFeature((), tf.string, default_value='jpeg'),
+      'image/class/label':
+          tf.FixedLenFeature(
+              [], tf.int64, default_value=tf.zeros([1], dtype=tf.int64)),
+    }
+
+    items_to_handlers = {
+	# todo: change this!!!
+      'image': slim.tfexample_decoder.Image(shape=[32, 32, 3], channels=3),
+      'image': slim.tfexample_decoder.Image('image_encoded', 'image/format'),
+      'label': slim.tfexample_decoder.Tensor('image/class/label', shape=[]),
+    }
+
+    decoder = slim.tfexample_decoder.TFExampleDecoder(
+      keys_to_features, items_to_handlers)
+
+    return slim.dataset.Dataset(
+      data_sources=os.path.join(dataset_dir,_FILE_PATTERN),
+      reader=reader,
+      decoder=decoder,
+      num_samples=_SPLITS_TO_SIZES[split_name],
+      num_classes=_NUM_CLASSES,
+      items_to_descriptions=_ITEMS_TO_DESCRIPTIONS,
+      labels_to_names=labels_to_names)
+
   dataset_name_to_module = {'mnist': mnist, 'mnist_m': mnist_m}
+  
   if dataset_name not in dataset_name_to_module:
     raise ValueError('Name of dataset unknown %s.' % dataset_name)
-
+  
   return dataset_name_to_module[dataset_name].get_split(split_name, dataset_dir,
                                                         file_pattern, reader)
 

@@ -1,0 +1,4 @@
+local_repository(
+	name="datasets",
+	path="/home/wanlu/tf_models/models/research/domain_adaptation/datasets"
+)
