@@ -1,6 +1,9 @@
 import random
 import tensorflow as tf
 from dataset_utils import _dataset_exists, _get_filenames_and_classes, write_label_file, _convert_dataset
+import cv2
+import os
+from PIL import Image
 
 flags = tf.app.flags
 
@@ -21,6 +24,15 @@ flags.DEFINE_string('tfrecord_filename', None, 'String: The output filename to n
 
 FLAGS = flags.FLAGS
 
+def reshape_img(folder):
+     for f in os.listdir(os.path.join(FLAGS.dataset_dir, folder)): 
+       for filename in os.listdir(os.path.join(FLAGS.dataset_dir, folder, f)):
+          img = cv2.imread(os.path.join(FLAGS.dataset_dir, folder, f, filename))
+          if img is not None:
+   	    img = cv2.resize(img,(224, 224), interpolation = cv2.INTER_AREA)
+	    im = Image.fromarray(img)
+	    im.save(os.path.join(FLAGS.dataset_dir, folder, f,filename))
+    
 def main():
     #=============CHECKS==============
     #Check if there is a tfrecord_filename entered
@@ -36,6 +48,9 @@ def main():
         print 'Dataset files already exist. Exiting without re-creating them.'
         return None
     #==========END OF CHECKS============
+    
+#    reshape_img(os.listdir(FLAGS.dataset_dir)[0])
+
     #Get a list of photo_filenames like ['123.jpg', '456.jpg'...] and a list of sorted class names from parsing the subdirectories.
     photo_filenames, class_names = _get_filenames_and_classes(FLAGS.dataset_dir)
 

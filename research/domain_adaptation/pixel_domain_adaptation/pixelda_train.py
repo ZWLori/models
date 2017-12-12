@@ -62,10 +62,10 @@ flags.DEFINE_integer(
     'print_loss_steps', 100,
     'The frequency with which the losses are printed, in steps.')
 
-flags.DEFINE_string('source_dataset', 'mnist', 'The name of the source dataset.'
+flags.DEFINE_string('source_dataset', 'amazon', 'The name of the source dataset.'
                     ' If hparams="arch=dcgan", this flag is ignored.')
 
-flags.DEFINE_string('target_dataset', 'mnist_m',
+flags.DEFINE_string('target_dataset', 'webcam',
                     'The name of the target dataset.')
 
 flags.DEFINE_string('source_split_name', 'train',
@@ -160,7 +160,7 @@ def _train(discriminator_train_op,
   scaffold = scaffold or tf.train.Scaffold()
 
   hooks = hooks or []
-
+  print('*****entering training')
   if is_chief:
     session_creator = tf.train.ChiefSessionCreator(
         scaffold=scaffold, checkpoint_dir=logdir, master=master)
@@ -193,21 +193,26 @@ def _train(discriminator_train_op,
   with tf.train.MonitoredSession(
       session_creator=session_creator, hooks=hooks) as session:
     loss = None
+    print('******with monitored session')
     while not session.should_stop():
       # Run the domain classifier op X times.
       for _ in range(hparams.discriminator_steps):
         if session.should_stop():
           return loss
+        print('before loss')
         loss, np_global_step = session.run(
             [discriminator_train_op, global_step])
+        print('after loss')
+	print(np_global_step)
         if np_global_step % FLAGS.print_loss_steps == 0:
           tf.logging.info('Step %d: Discriminator Loss = %.2f', np_global_step,
                           loss)
-
+      print('finish discriminator')
       # Run the generator op X times.
       for _ in range(hparams.generator_steps):
         if session.should_stop():
           return loss
+        print('in generator')
         loss, np_global_step = session.run([generator_train_op, global_step])
         if np_global_step % FLAGS.print_loss_steps == 0:
           tf.logging.info('Step %d: Generator Loss = %.2f', np_global_step,
@@ -283,6 +288,8 @@ def run_training(run_dir, checkpoint_dir, hparams):
           is_training=True,
           num_classes=num_target_classes)
 
+      print("*********After end_points")
+      print(source_labels)
       #################################
       # Get the variables to optimize #
       #################################
