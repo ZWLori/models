@@ -200,6 +200,7 @@ def _train(discriminator_train_op,
         if session.should_stop():
           return loss
         print('before loss')
+        print(tf.GraphKeys.TRAINABLE_VARIABLES)
         loss, np_global_step = session.run(
             [discriminator_train_op, global_step])
         print('after loss')
@@ -232,6 +233,13 @@ def run_training(run_dir, checkpoint_dir, hparams):
   Raises:
     ValueError: if hparams.arch is not recognized.
   """
+  print("**************************************************************")
+  print("**************************************************************")
+  print("Running from here")
+  print("**************************************************************")
+  print("**************************************************************")
+
+
   for path in [run_dir, checkpoint_dir]:
     if not tf.gfile.Exists(path):
       tf.gfile.MakeDirs(path)

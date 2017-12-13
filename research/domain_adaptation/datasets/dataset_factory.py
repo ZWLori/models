@@ -88,7 +88,7 @@ def get_dataset(dataset_name,
     }
 
     items_to_handlers = {
-      'image': slim.tfexample_decoder.Image(shape=[224,224,3], channels=3),
+      'image': slim.tfexample_decoder.Image(shape=[32,32,3], channels=3),
       'label': slim.tfexample_decoder.Tensor('image/class/label'),
     }
 
@@ -135,7 +135,7 @@ def provide_batch(dataset_name, split_name, dataset_dir, num_readers,
       labels: dictionary of labels.
   """
   dataset = get_dataset(dataset_name, split_name, dataset_dir)
-  print("####@@@@@@@________dataset_factory " + dataset_name + '_' + split_name)
+  print("########## dataset_factory ############" + dataset_name + '_' + split_name)
   provider = slim.dataset_data_provider.DatasetDataProvider(
       dataset,
       num_readers=num_readers,
@@ -159,7 +159,7 @@ def provide_batch(dataset_name, split_name, dataset_dir, num_readers,
   labels['classes'] = slim.one_hot_encoding(labels['classes'],
                                             dataset.num_classes)
   if dataset_name in ['amazon', 'webcam', 'dslr']:
-    images = tf.image.resize_images(images, [224,224])
+    images = tf.image.resize_images(images, [32,32])
 
   # Convert mnist to RGB and 32x32 so that it can match mnist_m.
   if dataset_name == 'mnist':

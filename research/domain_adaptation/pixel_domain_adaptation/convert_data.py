@@ -1,9 +1,6 @@
 import random
 import tensorflow as tf
 from dataset_utils import _dataset_exists, _get_filenames_and_classes, write_label_file, _convert_dataset
-import cv2
-import os
-from PIL import Image
 
 flags = tf.app.flags
 
@@ -14,7 +11,7 @@ flags.DEFINE_string('dataset_dir', None, 'String: Your dataset directory')
 flags.DEFINE_float('validation_size', 0.3, 'Float: The proportion of examples in the dataset to be used for validation')
 
 # The number of shards to split the dataset into.
-flags.DEFINE_integer('num_shards', 2, 'Int: Number of shards to split the TFRecord files into')
+flags.DEFINE_integer('num_shards', 1, 'Int: Number of shards to split the TFRecord files into')
 
 # Seed for repeatability.
 flags.DEFINE_integer('random_seed', 0, 'Int: Random seed to use for repeatability.')
@@ -24,15 +21,6 @@ flags.DEFINE_string('tfrecord_filename', None, 'String: The output filename to n
 
 FLAGS = flags.FLAGS
 
-def reshape_img(folder):
-     for f in os.listdir(os.path.join(FLAGS.dataset_dir, folder)): 
-       for filename in os.listdir(os.path.join(FLAGS.dataset_dir, folder, f)):
-          img = cv2.imread(os.path.join(FLAGS.dataset_dir, folder, f, filename))
-          if img is not None:
-   	    img = cv2.resize(img,(224, 224), interpolation = cv2.INTER_AREA)
-	    im = Image.fromarray(img)
-	    im.save(os.path.join(FLAGS.dataset_dir, folder, f,filename))
-    
 def main():
     #=============CHECKS==============
     #Check if there is a tfrecord_filename entered
@@ -48,12 +36,9 @@ def main():
         print 'Dataset files already exist. Exiting without re-creating them.'
         return None
     #==========END OF CHECKS============
-    
-#    reshape_img(os.listdir(FLAGS.dataset_dir)[0])
 
     #Get a list of photo_filenames like ['123.jpg', '456.jpg'...] and a list of sorted class names from parsing the subdirectories.
     photo_filenames, class_names = _get_filenames_and_classes(FLAGS.dataset_dir)
-
     #Refer each of the class name to a specific integer number for predictions later
     class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
